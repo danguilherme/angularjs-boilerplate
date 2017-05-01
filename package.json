@@ -1,0 +1,29 @@
+{
+  "name": "angularjs-boilerplate",
+  "version": "0.0.1",
+  "description": "Boilerplate foir AngularJS (1.x) apps",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^3.0.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sync": "^0.1.4",
+    "gulp-webserver": "^0.9.1",
+    "surge": "^0.19.0"
+  },
+  "scripts": {
+    "build": "npm install && bower install && gulp build",
+    "watch": "gulp watch",
+    "prestart": "npm install && bower install",
+    "start": "gulp build && gulp serve",
+    "deploy": "gulp build && surge ./",
+    "clean": "gulp clean",
+    "clean:build": "gulp clean:build"
+  },
+  "author": "",
+  "license": "MIT"
+}

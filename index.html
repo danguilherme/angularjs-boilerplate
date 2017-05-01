@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <meta name="theme-color" content="#239dce">
+  <meta name="description" content="Boilerplate code">
+
+  <base href="/">
+
+  <link rel="stylesheet" href="build/assets/vendor/components-font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="build/assets/css/app.css">
+
+  <title>AngularJS Boilerplate</title>
+</head>
+
+<body ng-app="aboilerplate" ng-controller="ShellController">
+  <header>
+    <h1>AngularJS Boilerplate</h1>
+  </header>
+
+  <main class="content">
+    <div class="container-fluid">
+      <div ng-view></div>
+    </div>
+  </main>
+
+  <footer>
+    <div>Copyright {{year}}. All rights reserved.</div>
+  </footer>
+
+  <script src="build/vendor.js"></script>
+  <script src="build/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+assets/vendor/
+assets/sass/
+build/assets/vendor/
+build/assets/sass/
+!build/assets/vendor/components-font-awesome/css/font-awesome.min.css 
+!build/assets/vendor/components-font-awesome/fonts/**/*
+app/**/*.js
