@@ -1,5 +1,5 @@
-# buzzer-front
-> Investmens simplified
+# AngularJS Boilerplate Project
+> The project headline goes here
 
 ## Executing
 
@@ -8,8 +8,8 @@
 
 ```bash
 $ npm install -g gulp-cli bower
-$ git clone https://github.com/the-artisans/buzzer-front.git
-$ cd buzzer-front
+$ git clone https://github.com/the-artisans/angularjs-boilerplate.git
+$ cd angularjs-boilerplate
 $ npm start
 ```
 
