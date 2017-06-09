@@ -1,64 +1,108 @@
-var gulp = require('gulp');
-var del = require('del');
-var sass = require('gulp-sass');
-var minifyCSS = require('gulp-csso');
-var plumber = require('gulp-plumber');
-var concat = require('gulp-concat');
-var gulpsync = require('gulp-sync')(gulp);
-var webserver = require('gulp-webserver');
+const gulp = require('gulp');
+const del = require('del');
+const babel = require('gulp-babel');
+const uglify = require('gulp-uglify');
+const sass = require('gulp-sass');
+const minifyCSS = require('gulp-csso');
+const plumber = require('gulp-plumber');
+const concat = require('gulp-concat');
+const gulpsync = require('gulp-sync')(gulp);
+const webserver = require('gulp-webserver');
 
-var paths = {
+const paths = {
   sass: './assets/scss/**/*.scss',
   vendorScripts: [
+    './assets/vendor/moment/min/moment.min.js',
+    './assets/vendor/moment/locale/pt-br.js',
     './assets/vendor/angular/angular.min.js',
-    './assets/vendor/angular-route/angular-route.min.js',
-    './assets/vendor/angular-bootstrap/ui-bootstrap.min.js',
-    './assets/vendor/moment/min/moment.min.js'
+    './assets/vendor/angular-route/angular-route.min.js'
   ]
-}
+};
 
-var build = {
-  root: 'build/',
+/**
+ * Dependencies that should go with the build
+ */
+const dependenciesToCopy = ['components-font-awesome'];
+
+const build = {
+  root: './build/',
+  jsFile: './build/app.js',
   assets: './build/assets',
   css: './build/assets/css'
-}
+};
 
-gulp.task('build:sass', function () {
+gulp.task('build:css:minify', function () {
+  return gulp.src(build.css + '/**/*')
+    .pipe(minifyCSS())
+    .pipe(gulp.dest(build.css));
+});
+
+gulp.task('build:css', function () {
   return gulp.src('./assets/scss/app.scss')
     .pipe(plumber(function (err) {
       console.error('ERROR', err.message);
       this.emit('end');
     }))
     .pipe(sass().on('error', sass.logError))
-    .pipe(minifyCSS())
     .pipe(gulp.dest(build.css));
 });
 
-gulp.task('build:concat:vendor', function () {
+gulp.task('build:js:concat:vendor', function () {
   return gulp.src(paths.vendorScripts)
     .pipe(concat('vendor.js'))
+    .pipe(plumber(function (err) {
+      console.error('ERROR', err.message);
+      this.emit('end');
+    }))
+    .pipe(uglify())
     .pipe(gulp.dest(build.root));
 });
 
-gulp.task('build:concat', ['build:concat:vendor'], function () {
+gulp.task('build:js:concat', ['build:js:concat:vendor'], function () {
   return gulp.src(['./app/app.js', 'app/**/*.js'])
     .pipe(concat('app.js'))
     .pipe(gulp.dest(build.root));
 });
 
+gulp.task('build:js:minify', () => {
+  return gulp.src(build.jsFile)
+    .pipe(plumber(function (err) {
+      console.error('ERROR', err.message);
+      this.emit('end');
+    }))
+    .pipe(uglify())
+    .pipe(gulp.dest(build.root));
+});
+
+gulp.task('build:js', ['build:js:concat'], () => {
+  return gulp.src(build.jsFile)
+    .pipe(plumber(function (err) {
+      console.error('ERROR', err.message);
+      this.emit('end');
+    }))
+    .pipe(babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest(build.root));
+});
+
 gulp.task('build:assets:vendor', function () {
   return gulp
-    .src(['./assets/vendor/{components-font-awesome,another}/**/*'])
+    .src([`./assets/vendor/{${dependenciesToCopy.join(',')}}/**/*`])
     .pipe(gulp.dest(build.assets + '/vendor'));
 });
 
-gulp.task('build:assets', ['build:assets:vendor'], function () {
+gulp.task('build:assets:misc', function () {
+  return gulp
+    .src(['./assets/*'])
+    .pipe(gulp.dest(build.assets));
+});
+
+gulp.task('build:assets', ['build:assets:misc', 'build:assets:vendor'], function () {
   return gulp
     .src(['./assets/{fonts,imgs}/**/*'])
     .pipe(gulp.dest(build.assets));
 });
-
-gulp.task('build', gulpsync.sync(['build:assets', 'build:concat', 'build:sass']));
 
 // clean all build files
 gulp.task('clean:build', function () {
@@ -71,16 +115,10 @@ gulp.task('clean:build', function () {
 gulp.task('clean:install', function () {
   return del([
     'node_modules/**',
-    'assets/vendor/**',
-    // need to negate the whole path because of a bug: https://github.com/sindresorhus/del/issues/3
-    '!assets/vendor',
-    '!assets/vendor/bootstrap',
-    '!assets/vendor/bootstrap/scss',
-    '!assets/vendor/bootstrap/scss/_custom.scss'
+    'assets/vendor/**'
   ], { dot: true });
 });
 
-gulp.task('clean', ['clean:install', 'clean:build']);
 
 gulp.task('serve', function () {
   gulp.src('./')
@@ -95,8 +133,11 @@ gulp.task('serve', function () {
 
 // Rerun the task when a file changes
 gulp.task('watch', ['build', 'serve'], function () {
-  gulp.watch('./assets/scss/*.scss', ['build']);
-  gulp.watch('./app/**/*', ['build']);
+  gulp.watch('./assets/scss/**/*.scss', ['build']);
+  gulp.watch('./app/**/*', ['build:js']);
 });
 
 gulp.task('default', ['watch']);
+gulp.task('build', ['build:assets', 'build:js', 'build:css']);
+gulp.task('dist', gulpsync.sync(['build', 'build:js:minify', 'build:css:minify']));
+gulp.task('clean', ['clean:install', 'clean:build']);
