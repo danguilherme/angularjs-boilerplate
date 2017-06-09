@@ -7,7 +7,6 @@
 1. Node.js (`4.5+`)
 
 ```bash
-$ npm install -g gulp-cli bower
 $ git clone https://github.com/the-artisans/angularjs-boilerplate.git
 $ cd angularjs-boilerplate
 $ npm start
